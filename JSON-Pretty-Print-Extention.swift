@@ -11,7 +11,15 @@ import Foundation
 import UIKit
 
 extension String {
-    func prettyPrintJSON (_ keyColor : UIColor = UIColor.init(red: 175/255.0, green: 0/255.0, blue: 65/255.0, alpha: 1), _ valueColor : UIColor = UIColor.init(red: 0/255.0, green: 174/255.0, blue: 114/255.0, alpha: 1), _ levelSpace : Int = 4) -> NSMutableAttributedString {
+    func prettyPrintJSON (
+        fontSize : CGFloat = 13,
+        keyColor : UIColor = UIColor.init(red: 195/255.0, green: 58/255.0, blue: 76/255.0, alpha: 1),
+        valueColor : UIColor = UIColor.init(red: 153/255.0, green: 163/255.0, blue: 48/255.0, alpha: 1),
+        levelSpace : Int = 4,
+        trueColor : UIColor = UIColor.init(red: 57/255.0, green: 24/255.0, blue: 148/255.0, alpha: 1),
+        falseColor : UIColor = UIColor.init(red: 57/255.0, green: 24/255.0, blue: 148/255.0, alpha: 1),
+        intColor : UIColor = UIColor.init(red: 57/255.0, green: 24/255.0, blue: 148/255.0, alpha: 1),
+        nullColor : UIColor = UIColor.gray) -> NSMutableAttributedString {
         var valid = false
         if let jsonDataToVerify = self.data(using: String.Encoding.utf8)
         {
@@ -33,6 +41,10 @@ extension String {
             var result = ""
             var keyRange = [NSRange]()
             var valRange = [NSRange]()
+            var trueRange = [NSRange]()
+            var falseRange = [NSRange]()
+            var intRange = [NSRange]()
+            var nullRange = [NSRange]()
             var openIndex = 0
             var isKey = false
             
@@ -75,6 +87,18 @@ extension String {
                     if open {
                         result = "\(result)\(char)"
                     } else {
+                        if result.suffix(4) == "true" {
+                            trueRange.append(NSMakeRange(result.count - 4, 4))
+                        } else if result.suffix(5) == "false" {
+                            falseRange.append(NSMakeRange(result.count - 5, 5))
+                        }
+                        else if result.suffix(4) == "null" {
+                            nullRange.append(NSMakeRange(result.count - 4, 4))
+                        } else if result[result.count-1] != "\"" && result[result.count-1] != "}" && result[result.count-1] != "]" {
+                            let range = result.range(of: ":", options: .backwards)!
+                            let intIndex = result.distance(from: result.startIndex, to: range.lowerBound)
+                            intRange.append(NSMakeRange(intIndex + 2, result.count - intIndex - 1))
+                        }
                         level -= 1
                         result = "\(result)\n"
                         for _ in 0..<level {
@@ -86,6 +110,18 @@ extension String {
                     if open {
                         result = "\(result)\(char)"
                     } else {
+                        if result.suffix(4) == "true" {
+                            trueRange.append(NSMakeRange(result.count - 4, 4))
+                        } else if result.suffix(5) == "false" {
+                            falseRange.append(NSMakeRange(result.count - 5, 5))
+                        }
+                        else if result.suffix(4) == "null" {
+                            nullRange.append(NSMakeRange(result.count - 4, 4))
+                        } else if result[result.count-1] != "\"" && result[result.count-1] != "}" && result[result.count-1] != "]" {
+                            let range = result.range(of: ":", options: .backwards)!
+                            let intIndex = result.distance(from: result.startIndex, to: range.lowerBound)
+                            intRange.append(NSMakeRange(intIndex + 2, result.count - intIndex - 1))
+                        }
                         isKey = true
                         result = "\(result),\n"
                         for _ in 0..<level {
@@ -120,12 +156,30 @@ extension String {
                 }
             }
             let attributedString = NSMutableAttributedString(string: result)
+            attributedString.addAttribute(NSAttributedStringKey.font, value: UIFont.systemFont(ofSize: fontSize), range: NSMakeRange(0, result.count))
             for range in keyRange {
                 attributedString.addAttribute(NSAttributedStringKey.foregroundColor, value: keyColor, range: range)
             }
             for range in valRange {
                 attributedString.addAttribute(NSAttributedStringKey.foregroundColor, value: valueColor, range: range)
             }
+            for range in trueRange {
+                attributedString.addAttribute(NSAttributedStringKey.foregroundColor, value: trueColor , range: range)
+                attributedString.addAttribute(NSAttributedStringKey.font, value: UIFont.boldSystemFont(ofSize: fontSize) , range: range)
+            }
+            for range in falseRange {
+                attributedString.addAttribute(NSAttributedStringKey.foregroundColor, value: falseColor , range: range)
+                attributedString.addAttribute(NSAttributedStringKey.font, value: UIFont.boldSystemFont(ofSize: fontSize) , range: range)
+            }
+            for range in intRange {
+                attributedString.addAttribute(NSAttributedStringKey.foregroundColor, value: intColor , range: range)
+                attributedString.addAttribute(NSAttributedStringKey.font, value: UIFont.boldSystemFont(ofSize: fontSize) , range: range)
+            }
+            for range in nullRange {
+                attributedString.addAttribute(NSAttributedStringKey.foregroundColor, value: nullColor , range: range)
+                attributedString.addAttribute(NSAttributedStringKey.font, value: UIFont.boldSystemFont(ofSize: fontSize) , range: range)
+            }
+            
             return attributedString
         } else {
             return NSMutableAttributedString()
