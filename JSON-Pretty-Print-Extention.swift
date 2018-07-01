@@ -94,7 +94,7 @@ extension String {
                         }
                         else if result.suffix(4) == "null" {
                             nullRange.append(NSMakeRange(result.count - 4, 4))
-                        } else if result[result.count-1] != "\"" && result[result.count-1] != "}" && result[result.count-1] != "]" {
+                        } else if result[result.count-1] != "\"" && result[result.count-1] != "}" && result[result.count-1] != "]"  && result[result.count-1] != " " {
                             let range = result.range(of: ":", options: .backwards)!
                             let intIndex = result.distance(from: result.startIndex, to: range.lowerBound)
                             intRange.append(NSMakeRange(intIndex + 2, result.count - intIndex - 1))
@@ -117,7 +117,7 @@ extension String {
                         }
                         else if result.suffix(4) == "null" {
                             nullRange.append(NSMakeRange(result.count - 4, 4))
-                        } else if result[result.count-1] != "\"" && result[result.count-1] != "}" && result[result.count-1] != "]" {
+                        } else if result[result.count-1] != "\"" && result[result.count-1] != "}" && result[result.count-1] != "]"  && result[result.count-1] != " " {
                             let range = result.range(of: ":", options: .backwards)!
                             let intIndex = result.distance(from: result.startIndex, to: range.lowerBound)
                             intRange.append(NSMakeRange(intIndex + 2, result.count - intIndex - 1))
