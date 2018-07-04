@@ -149,8 +149,12 @@ extension String {
                         }
                     }
                     result = "\(result)\""
-                case " ","\n":
+                case "\n":
                     break
+                case " ":
+                    if open {
+                        result = "\(result)\(char)"
+                    }
                 default:
                     result = "\(result)\(char)"
                 }
